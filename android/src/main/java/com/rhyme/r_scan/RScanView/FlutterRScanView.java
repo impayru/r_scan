@@ -1,5 +1,13 @@
 package com.rhyme.r_scan.RScanView;
 
+import android.app.Activity;
+import io.flutter.plugin.common.EventChannel;
+import io.flutter.plugin.common.MethodChannel;
+import io.flutter.plugin.common.MethodCall;
+import io.flutter.plugin.platform.PlatformView;
+import io.flutter.view.TextureRegistry;
+import com.rhyme.r_scan.permissions.RScanPermissions;
+
 import android.content.Context;
 import android.graphics.ImageFormat;
 import android.util.DisplayMetrics;
@@ -47,6 +55,7 @@ public class FlutterRScanView implements PlatformView, EventChannel.StreamHandle
     private final Object args;
     private final RScanPermissions permissions;
     private final TextureRegistry textureRegistry;
+    private EventChannel.EventSink eventSink;
 
     private TextureView textureView;
     private LifecycleRegistry lifecycleRegistry;
