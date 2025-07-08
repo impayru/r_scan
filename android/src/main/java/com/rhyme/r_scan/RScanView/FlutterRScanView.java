@@ -39,36 +39,82 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.platform.PlatformView;
 
-public class FlutterRScanView implements PlatformView, LifecycleOwner, EventChannel.StreamHandler, MethodChannel.MethodCallHandler {
-    private static final String TAG = "FlutterRScanView";
+public class FlutterRScanView implements PlatformView, EventChannel.StreamHandler, MethodChannel.MethodCallHandler, LifecycleOwner {
 
-    private LifecycleRegistry lifecycleRegistry;
+    private final Activity activity;
+    private final BinaryMessenger messenger;
+    private final int viewId;
+    private final Object args;
+    private final RScanPermissions permissions;
+    private final TextureRegistry textureRegistry;
+
     private TextureView textureView;
-    private boolean isPlay;
-    private static final String scanViewType = "com.rhyme_lph/r_scan_view";
-    private EventChannel.EventSink eventSink;
-    private long lastCurrentTimestamp = 0L;//最后一次的扫描
+    private LifecycleRegistry lifecycleRegistry;
     private Preview mPreview;
 
-    FlutterRScanView(Context context, BinaryMessenger messenger, int i, Object o) {
-        Map map = (Map) o;
-        Boolean _isPlay = (Boolean) map.get("isPlay");
-        isPlay = _isPlay == Boolean.TRUE;
+    private static final String TAG = "FlutterRScanView";
+    private final String scanViewType = "flutter_r_scan_view";
 
-        new EventChannel(messenger, scanViewType + "_" + i + "/event")
-                .setStreamHandler(this);
-        MethodChannel methodChannel = new MethodChannel(messenger, scanViewType + "_" + i + "/method");
+    private boolean isPlay = false;
+
+    // Новый конструктор с Activity и всеми параметрами
+    public FlutterRScanView(Activity activity,
+                            BinaryMessenger messenger,
+                            RScanPermissions permissions,
+                            TextureRegistry textureRegistry,
+                            int viewId,
+                            Object args) {
+        this.activity = activity;
+        this.messenger = messenger;
+        this.permissions = permissions;
+        this.textureRegistry = textureRegistry;
+        this.viewId = viewId;
+        this.args = args;
+
+        initView();
+    }
+
+    // Для обратной совместимости старый конструктор
+    public FlutterRScanView(Context context,
+                            BinaryMessenger messenger,
+                            int viewId,
+                            Object args) {
+        this.activity = (Activity) context;
+        this.messenger = messenger;
+        this.permissions = null; // если надо, добавьте инициализацию
+        this.textureRegistry = null; // если надо, добавьте инициализацию
+        this.viewId = viewId;
+        this.args = args;
+
+        initView();
+    }
+
+    private void initView() {
+        // Разбор аргументов
+        if (args instanceof Map) {
+            Map map = (Map) args;
+            Boolean _isPlay = (Boolean) map.get("isPlay");
+            isPlay = _isPlay != null && _isPlay;
+        }
+
+        // Создаем EventChannel и MethodChannel
+        new EventChannel(messenger, scanViewType + "_" + viewId + "/event").setStreamHandler(this);
+        MethodChannel methodChannel = new MethodChannel(messenger, scanViewType + "_" + viewId + "/method");
         methodChannel.setMethodCallHandler(this);
-        textureView = new TextureView(context);
+
+        textureView = new TextureView(activity);
         lifecycleRegistry = new LifecycleRegistry(this);
+
+        // Получаем метрики дисплея
         DisplayMetrics outMetrics = new DisplayMetrics();
-
-        WindowManager manager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        WindowManager manager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
         manager.getDefaultDisplay().getMetrics(outMetrics);
-        Log.d(TAG, "FlutterRScanView: " + outMetrics.toString());
-        mPreview = buildPreView(outMetrics.widthPixels, outMetrics.heightPixels);
-        CameraX.bindToLifecycle(this, mPreview, buildImageAnalysis());
+        Log.d(TAG, "FlutterRScanView metrics: " + outMetrics.toString());
 
+        mPreview = buildPreView(outMetrics.widthPixels, outMetrics.heightPixels);
+
+        // Привязываем к lifecycle камеры
+        CameraX.bindToLifecycle(this, mPreview, buildImageAnalysis());
     }
 
     @Override
