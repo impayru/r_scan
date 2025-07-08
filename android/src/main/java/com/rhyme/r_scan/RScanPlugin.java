@@ -6,6 +6,7 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 
 import com.rhyme.r_scan.RScanCamera.RScanPermissions;
+package com.rhyme.r_scan.RScanView.RScanViewFactory;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
