@@ -196,7 +196,7 @@ class RScanCameraDescription {
 
   @override
   int get hashCode {
-    return hashValues(name, lensDirection);
+    return Object.hash(name, lensDirection);
   }
 
   @override

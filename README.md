@@ -12,7 +12,8 @@ A flutter plugin about qr code or bar code scan , it can scan from file、url、
 Add this to your package's pubspec.yaml file:
 ```yaml
 dependencies:
-  r_scan: last version
+  r_scan:
+    git: https://github.com/impayru/r_scan
 ```
 
 ### Android Platform
