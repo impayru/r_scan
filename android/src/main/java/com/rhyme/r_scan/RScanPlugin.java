@@ -49,8 +49,7 @@ public class RScanPlugin implements FlutterPlugin, ActivityAware {
                 activity,
                 messenger,
                 permissions,
-                textureRegistry,
-                viewRegistry
+                textureRegistry
         );
 
         pluginBinding.getPlatformViewRegistry().registerViewFactory("r_scan_view", factory);
