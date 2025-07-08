@@ -43,7 +43,12 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
         methodChannel.setMethodCallHandler(this);
 
         //注册老方式
-        RScanViewPlugin.registerWith(this.platformViewRegistry, this.messenger);
+        RScanViewPlugin.registerWith(
+                this.platformViewRegistry,
+                this.activity,
+                this.messenger,
+                this.textureRegistry
+        );
 
         //注册新的方式
         new RScanCameraMethodHandler(
