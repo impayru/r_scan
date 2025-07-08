@@ -6,7 +6,7 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.platform.PlatformView;
 import io.flutter.view.TextureRegistry;
-import com.rhyme.r_scan.permissions.RScanPermissions;
+import com.rhyme.r_scan.RScanCamera.RScanPermissions;
 
 import android.content.Context;
 import android.graphics.ImageFormat;
@@ -216,6 +216,7 @@ public class FlutterRScanView implements PlatformView, EventChannel.StreamHandle
     private class QRCodeAnalyzer implements ImageAnalysis.Analyzer {
         private static final String TAG = "QRCodeAnalyzer";
         private MultiFormatReader reader = new MultiFormatReader();
+        private long lastCurrentTimestamp = 0;
 
         @Override
         public void analyze(ImageProxy image, int rotationDegrees) {
